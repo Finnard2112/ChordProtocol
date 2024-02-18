@@ -1,0 +1,62 @@
+syntax = "proto2";
+
+message Node {
+  required fixed64 key = 1;
+  required fixed32 address = 2;
+  required uint32 port = 3;
+}
+
+// Notify
+message NotifyRequest {
+  required Node node = 1; // Not necessary, but doesn't hurt
+}
+message NotifyResponse {}
+
+// Find Successor
+message FindSuccessorRequest {
+  required fixed64 key = 1;
+  optional Node requester = 2; // allows recursive to actually be more efficient
+}
+message FindSuccessorResponse {
+  required Node node = 1;
+  optional fixed64 key = 2; // more useful if recursive or UDP?
+}
+
+// Get Predecessor
+message GetPredecessorRequest {}
+message GetPredecessorResponse {
+  required Node node = 1;
+}
+
+// Check Predecessor
+message CheckPredecessorRequest {}
+message CheckPredecessorResponse {}
+
+// Get Successor
+message GetSuccessorListRequest {}
+message GetSuccessorListResponse {
+  repeated Node successors = 1;
+}
+
+message ChordMessage {
+  required uint32 version = 1 [ default = 417 ];
+  optional int32 query_id = 14;
+  reserved 12, 13; // time crumbles things
+
+  oneof msg {
+    NotifyRequest notify_request = 2;
+    NotifyResponse notify_response = 3;
+
+    FindSuccessorRequest find_successor_request = 4;
+    FindSuccessorResponse find_successor_response = 5;
+
+    GetPredecessorRequest get_predecessor_request = 6;
+    GetPredecessorResponse get_predecessor_response = 7;
+
+    CheckPredecessorRequest check_predecessor_request = 8;
+    CheckPredecessorResponse check_predecessor_response = 9;
+
+    GetSuccessorListRequest get_successor_list_request = 10;
+    GetSuccessorListResponse get_successor_list_response = 11;
+  }
+}
